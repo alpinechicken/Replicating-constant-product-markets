@@ -1,0 +1,276 @@
+\documentclass[12pt]{article}
+
+\usepackage{amssymb,amsmath,amsfonts,eurosym,geometry,ulem,graphicx,caption,color,setspace,sectsty,comment,footmisc,caption,natbib,pdflscape,subfigure,array,hyperref}
+
+\normalem
+
+\onehalfspacing
+\newtheorem{theorem}{Theorem}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{proposition}{Proposition}
+\newenvironment{proof}[1][Proof]{\noindent\textbf{#1.} }{\ \rule{0.5em}{0.5em}}
+
+\newtheorem{hyp}{Hypothesis}
+\newtheorem{subhyp}{Hypothesis}[hyp]
+\renewcommand{\thesubhyp}{\thehyp\alph{subhyp}}
+
+\newcommand{\red}[1]{{\color{red} #1}}
+\newcommand{\blue}[1]{{\color{blue} #1}}
+
+\newcolumntype{L}[1]{>{\raggedright\let\newline\\arraybackslash\hspace{0pt}}m{#1}}
+\newcolumntype{C}[1]{>{\centering\let\newline\\arraybackslash\hspace{0pt}}m{#1}}
+\newcolumntype{R}[1]{>{\raggedleft\let\newline\\arraybackslash\hspace{0pt}}m{#1}}
+
+\geometry{left=1.0in,right=1.0in,top=1.0in,bottom=1.0in}
+
+\begin{document}
+
+\begin{titlepage}
+\title{Are constant product market oracles safe?}
+\author{Joseph Clark\thanks{RMIT Blockchain Innovation Hub} }
+\date{\today}
+\maketitle
+\begin{abstract}
+\noindent We derive bounds for profitable manipulation of a constant product market used as a reference provider (oracle) for a margin position. Such bounds exist in terms of limits imposed on deposits the constant product market and the margin position, and depend on the assumptions on the elasticity of the underlying spot market.
+%\vspace{0in}\\
+%\noindent\textbf{Keywords:} key1, key2, key3\\
+%\vspace{0in}\\
+%\noindent\textbf{JEL Codes:} key1, key2, key3\\
+
+\bigskip
+\end{abstract}
+\setcounter{page}{0}
+\thispagestyle{empty}
+\end{titlepage}
+\pagebreak \newpage
+
+
+
+
+\doublespacing
+
+
+\section{Introduction} \label{sec:introduction}
+
+A recent paper by Angeris et al \cite{ang20} derived some formal properties of constant product markets (CPMs) including an explicit bound on the cost of manipulating the price in the presence of an infinitely liquid underlying market. We continue in a similar vein to show the bounds on profitable manipulation of a margin position that is using the CPM for a reference price.  
+
+There are two relevant attacks. The first is: (a) a deposit to the CPM to manipulate the observed price and then, (b) a deposit to the margin position that releases more than the deposit is worth in the spot market. The second attack is a variation on the first: an equity holder in the CPM strategically withdraws liquidity (to cheapen manipulation) and then carries out the first attack.
+
+The solution is joint no-arbitrage bounds on deposits to the CPM and the margin position (our theorem \ref{depositBounds}).
+
+
+%The first attack can be prevented by joint deposit limits on the the CPM and the margin position (our theorem \ref{depositBounds}). The second attack is linear in the first, so we can consider the first and then adjust for the possibility of malicious shareholders (i.e. we derive in terms of a given level of reserves and adjust for the possibility that the reserves have been manipulated). 
+
+\section{Preliminaries}
+
+\textbf{Definition 1: Margin position}
+
+The state of a margin position is a tuple $(t, m^r(t), M_I, M_V, R_\beta, R_\alpha, D_T, T)$. The observed reference price at time $t$ is $m^r(t)$ for units of $\beta$ per unit of $\alpha$, $M_I$ and $M_V$ are the initial and variation margin, $R_\beta, R_\alpha$ are the reserves held in the margin position, and $D_T$ is discount rate for the margin position maturing at $T$. Note that if $R_\alpha<0$ the margin position has minted these units.
+
+At time $t$ a deposit $\Delta_\beta$  will generate a release 
+
+\[\Delta_\alpha = \frac{D_T \Delta_\beta}{m^r(t) M_I }\]
+
+Reserves are updated according to $R_\beta \mapsto R_\beta + \Delta_\beta$, $R_\alpha \mapsto R_\alpha - \Delta_\alpha$. 
+
+At any subsequent time before $T$ if the liquidation value of the collateral $R_\beta/m^r(t)$ falls below the collateral requirement $M_V R_\alpha$, the position is liquidated into units of $\alpha$, which are retained up to $R_\alpha/D_T$ and the remainder released to the depositor.   
+
+
+\textbf{Definition 2: Constant product market}
+
+A constant product market (CPM) is a tuple $(t, R_\beta, R_\alpha)$. A transaction depositing $\Delta_\beta$ at time $t$ will receive $\Delta_\alpha$ satisfying
+
+\[(R_\alpha - \Delta_\alpha)(R_\beta + \Delta_\beta) = k\]
+
+Where $R_\beta,R_\alpha >0$,  $k=R_\alpha R_\beta$. Reserves are updated according to $R_\beta \mapsto R_\beta + \Delta_\beta$, $R_\alpha \mapsto R_\alpha - \Delta_\alpha$.
+
+For simplicity the initial reserves are exogenous.
+
+\textbf{Definition 3: Spot market}
+
+A spot market is a mechanism which exchanges $\Delta_\alpha$ units of $\alpha$ for $m^p(t)\Delta_\beta$ units of $\beta$ at time $t$. An infinitely elastic spot market is one where $m^p(t)$ does is not depend on $\Delta_\beta$
+
+
+
+
+\section{Cost of manipulation}
+
+Consider the interaction between a margin position and a constant product market it uses as an oracle. To differentiate between the two markets we use superscripts $cp$ and $mp$.
+
+Under arbitrage between the spot market and the CPM the reserves ratio matches the market price $m^{cp} = R_\beta^{cp}/R_\alpha^{cp} = m^p$. The profit from temporarily manipulating the price to $m^p(1+\epsilon)$ is (see \cite{ang20}) 
+
+\begin{equation}
+\label{Picp}
+\Pi^{cp}(\epsilon) =  -R_\beta^{cp} ( \sqrt{1+\epsilon}  - (\sqrt{1+\epsilon})^{-1}-2) 
+\end{equation}
+
+If a margin position uses the CPM price as a reference (i.e. $m^r(t) = m^{cp}(t)$) the profit from manipulating the price to $m^p(t)(1+\epsilon)$ is
+
+\begin{equation}
+\label{pimp}
+\pi^{mp}(\epsilon) = \frac{D_T(1+\epsilon)}{M_I}-1
+\end{equation}
+
+
+per unit of collateral deposited. The total profit from depositing $\Delta_\beta^{mp}$ is then
+
+\begin{equation}
+\label{picp}
+\Pi^{mp}(\epsilon) = \Delta_\beta^{mp} \pi^{mp}(\epsilon)  
+\end{equation}
+
+
+\section{Bounds on manipulation}
+
+Since (\ref{picp}) scales linearly with $\Delta_\beta^{mp}$, as long as it is positive there is always some $\epsilon$ at which a profitable manipulation can be constructed. To bound this we need deposit limits on both the CPM and the margin position. 
+
+
+\begin{theorem}
+\label{depositBounds}
+For any margin position and CPM state there is a joint bound on collateral deposits such that no profitable manipulation exists in consecutive periods $t$, $t+1$ given an infinitely elastic spot market.
+\end{theorem}
+
+\begin{proof}
+
+For each $\epsilon$ there is some bound on collateral deposits under at which $\Pi^{cp}(\epsilon) +\Pi^{mp}(\epsilon) = 0$ given by
+
+\begin{equation}
+\label{boundaryDeltamp}
+\bar{\Delta}_\beta^{mp}(\epsilon) = \frac{\Pi^{cp}(\epsilon)}{\pi^{mp}(\epsilon) }
+\end{equation}
+
+To bound the manipulation we pick an arbitrary $\bar{\epsilon}>0$ and limit any individual deposit to the CPM at
+
+\begin{equation}
+\label{boundaryDeltacp}
+\bar{\Delta}_\beta^{cp}(\bar{\epsilon})  = R_\beta^{cp}(\sqrt{1+\bar{\epsilon}} -1)
+\end{equation}
+
+and any deposit to the margin position at 
+
+\[ \bar{\Delta}_\beta^{mp} = \Delta_\beta^{mp} (\bar{\epsilon}) \]
+
+Then since $\frac{\partial \Pi^{mp}}{\partial \Delta_\beta^{mp} }\geq 0$  there is no combination $(\Delta_\beta^{cp} \leq \bar{\Delta}_\beta^{cp}, \Delta_\beta^{mp} \leq \bar{\Delta}_\beta^{mp})$ that gives $\Pi^{cp} +\Pi^{mp} > 0$   
+
+\end{proof}
+
+\subsection*{Example}
+
+A margin position has initial state 
+\[(t, m^r(t), M_I, M_V, R_\beta, R_\alpha, D_T, T) = (1, 0.05, 1.5, 1.2, 0, 0, 1, 2)\]
+
+A connected CPM has state 
+
+\[(t, R_\beta, R_\alpha) = (100, 2000)\] 
+
+We set the maximum market manipulation at $\bar{\epsilon} = 0.71$. The profit per unit of $\beta$ collateral is (from \ref{picp})
+
+\[\pi^{mp}(\epsilon) = \frac{D_T(1+\epsilon)}{M_I}-1  = (1+0.71)/1.5-1 = 0.14 \]
+
+The deposit required to manipulate to this level is (from \ref{boundaryDeltacp})
+
+\begin{eqnarray*}
+\bar{\Delta}_\beta^{cp}(\bar{\epsilon})  =& R_\beta^{cp}(\sqrt{1+\bar{\epsilon}} -1) \\
+                                         =& 100*(\sqrt{1+0.71}-1) = 30.77
+\end{eqnarray*}
+
+The profit from manipulating the CPM is (from \ref{Picp})
+
+\begin{eqnarray*}
+\Pi^{cp}(\epsilon) =&  -R_\beta^{cp} ( \sqrt{1+\epsilon}  - (\sqrt{1+\epsilon})^{-1}-2)\\  
+                   =&  -100(\sqrt{1+0.71} + (\sqrt{1+0.71})^{-1} -2) \approx -7.24
+\end{eqnarray*}
+
+The boundary for a profitable attack is (from \ref{boundaryDeltamp})
+
+\[ \bar{\Delta}_\beta^{mp}(\epsilon) = -\frac{\Pi^{cp}(\epsilon)}{\pi^{mp}(\epsilon) } = 7.24/0.14 \approx 51.7\]
+
+To prevent an attack place a limit of deposits to the margin position at 51.7 units and to the CPM at 30.77 (units of $\beta$).  The CPM can be manipulated by at most 71\% (by depositing 30.77 units) resulting in -7.24 profit from the CPM, at which level the profit from depositing the maximum 51.7 units to the margin position is 7.24, giving a total profit of 0.
+
+
+
+
+
+
+\singlespacing
+\setlength\bibsep{0pt}
+\bibliographystyle{my-style}
+\bibliography{Placeholder}
+
+
+
+\clearpage
+
+\onehalfspacing
+
+%\section*{Tables} \label{sec:tab}
+%\addcontentsline{toc}{section}{Tables}
+
+
+
+%\clearpage
+
+%\section*{Figures} \label{sec:fig}
+%\addcontentsline{toc}{section}{Figures}
+
+%\begin{figure}[hp]
+%  \centering
+%  \includegraphics[width=.6\textwidth]{../fig/placeholder.pdf}
+%  \caption{Placeholder}
+%  \label{fig:placeholder}
+%\end{figure}
+
+
+
+
+\clearpage
+
+\section*{Appendix A. Multi-period reference observations} \label{sec:appendixa}
+\addcontentsline{toc}{section}{Appendix A: }
+
+The bounds from theorem \ref{depositBounds} can be relaxed by adding structure to the way that the margin position records the reference price from the CDP.
+
+Maintaining the assumption of an infinitely liquid spot market the margin position can observe a sequence of reserves in the $CDP$ up to time $t$
+
+\[\left(R_\beta^{CP}(\tau), R_\alpha^{CP}(\tau)\right)_{\tau=t-\tau'}^t \]
+
+Under perfect arbitrage and again if the spot market is perfectly liquid a prospective market manipulator can hope at best to generate a sequence of reference prices
+
+\[\left(m^p(1), (1+\bar{\epsilon})m^p(2), m^p(3), (1+\bar{\epsilon})m^p(4), m^p(5) \ldots (1+\bar{\epsilon})m^p(t)
+\right) \]
+
+If the margin position can assume the worst price in each series for the purposes of determining the initial release.
+
+\[\Delta_\alpha = \frac{D_T \Delta_\beta}{m^{r*}(t) M_I }\]
+
+Where 
+
+\[ m^{r*}(t) = \min((m^r(t))_{\tau=t-\tau'}^t  ) \]
+
+The cost of manipulating over $\tau'$ periods is 
+
+\[ \Pi^{cp}(\bar{\epsilon}, R_\beta^{cp}(2)) + \Pi^{cp}(\bar{\epsilon}, R_\beta^{cp}(4)), \ldots \Pi^{cp}(\bar{\epsilon}, R_\beta^{cp}(t))) \]
+
+Manipulating in a sequence is more expensive by a factor of $\tau'/2$  so the margin position and the CDP the can safely tolerate proportionally higher maximum deposits.
+
+
+% Extensions:
+% Not perfectly inelastic spot market
+% Attack where to manipulate price downwards so that the MP liquidates the collateral too cheaply.
+
+
+\begin{thebibliography}{}
+\bibitem{ang20} Angeris, Guillermo, Hsien-Tang Kao, Rei Chiang, Charlie Noyes, and Tarun Chitra  \textit{An analysis of Uniswap markets}, arXiv preprint arXiv:1911.03380, 2020.
+
+\bibitem{Zha18} Zhang, Yi, Xiaohong Chen, and Daejun Park (2018) Formal specification of constant product (xy=k) market maker model and implementation. 2018.
+
+%@article{angeris2019analysis,
+%  title={An analysis of Uniswap markets},
+%  author={Angeris, Guillermo and Kao, Hsien-Tang and Chiang, Rei and Noyes, %Charlie and Chitra, Tarun},
+%  journal={arXiv preprint arXiv:1911.03380},
+%  year={2019}
+
+
+\end{thebibliography}
+
+\end{document}
